@@ -7,7 +7,7 @@ use std::sync::{Arc};
 use std::thread;
 use std::time::{Duration, Instant, SystemTime};
 
-struct LatRet {
+pub struct LatRet {
     nanos: Vec<f64>,
     p_tiles: Vec<f64>,
     total: u64,
@@ -44,14 +44,14 @@ fn time_format(t: f64) -> String {
     }
 }
 
-struct DefaultPrinter {}
+pub struct DefaultPrinter {}
 impl LatPrinter for DefaultPrinter {
     fn log(&self, name: &str, lat_ret: &LatRet) {
         println!("{}, {}", name, lat_ret.to_string());
     }
 }
 
-trait LatPrinter {
+pub trait LatPrinter {
     fn log(&self, name: &str, lat_ret: &LatRet);
 }
 
@@ -59,7 +59,7 @@ lazy_static! {
     static ref START: Instant = Instant::now();
 }
 
-struct LatencyTimer<T> where T : LatPrinter + Send + Sync {
+pub struct LatencyTimer<T> where T : LatPrinter + Send + Sync {
     name: String,
     lat_printer: T,
     bins: Vec<AtomicU64>,
@@ -114,7 +114,7 @@ fn get_time2() -> u64 {
     // tick_counter::x86_64_tick_counter()
 }
 impl<T> LatencyTimer<T> where T : LatPrinter + Send + Sync + 'static{
-    fn count1(&self) {
+    pub fn count1(&self) {
         let now: u64 = get_time2();
         let last_count = self.last_count.swap(now, Relaxed);
         if last_count != 0 {
@@ -178,9 +178,8 @@ impl<T> LatencyTimer<T> where T : LatPrinter + Send + Sync + 'static{
         ret
 
     }
-
 }
-fn  run<T>(t: &Arc<LatencyTimer<T>>)
+pub fn  run<T>(t: &Arc<LatencyTimer<T>>)
 where T : LatPrinter + Send + Sync + 'static  {
     let tt = t.clone();
     thread::spawn(move || {
